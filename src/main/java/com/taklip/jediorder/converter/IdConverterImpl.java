@@ -1,10 +1,12 @@
 package com.taklip.jediorder.converter;
 
+import org.springframework.stereotype.Component;
+
 import com.taklip.jediorder.bean.Id;
 import com.taklip.jediorder.bean.IdMeta;
 
+@Component
 public class IdConverterImpl implements IdConverter {
-
 	public IdConverterImpl() {
 	}
 
@@ -15,17 +17,10 @@ public class IdConverterImpl implements IdConverter {
 	protected long doConvert(Id id, IdMeta idMeta) {
 		long ret = 0;
 
-		ret |= id.getMachine();
-
-		ret |= id.getSeq() << idMeta.getSeqBitsStartPos();
-
+		ret |= id.getVersion();
 		ret |= id.getTime() << idMeta.getTimeBitsStartPos();
-
-		ret |= id.getGenMethod() << idMeta.getGenMethodBitsStartPos();
-
-		ret |= id.getType() << idMeta.getTypeBitsStartPos();
-
-		ret |= id.getVersion() << idMeta.getVersionBitsStartPos();
+		ret |= id.getMachine() << idMeta.getMachineBitsStartPos();
+		ret |= id.getSequence() << idMeta.getSequenceBitsStartPos();
 
 		return ret;
 	}
@@ -37,17 +32,10 @@ public class IdConverterImpl implements IdConverter {
 	protected Id doConvert(long id, IdMeta idMeta) {
 		Id ret = new Id();
 
-		ret.setMachine(id & idMeta.getMachineBitsMask());
-
-		ret.setSeq((id >>> idMeta.getSeqBitsStartPos()) & idMeta.getSeqBitsMask());
-
+		ret.setVersion(id & idMeta.getVersionBitsMask());
 		ret.setTime((id >>> idMeta.getTimeBitsStartPos()) & idMeta.getTimeBitsMask());
-
-		ret.setGenMethod((id >>> idMeta.getGenMethodBitsStartPos()) & idMeta.getGenMethodBitsMask());
-
-		ret.setType((id >>> idMeta.getTypeBitsStartPos()) & idMeta.getTypeBitsMask());
-
-		ret.setVersion((id >>> idMeta.getVersionBitsStartPos()) & idMeta.getVersionBitsMask());
+		ret.setMachine((id >>> idMeta.getMachineBitsStartPos()) & idMeta.getMachineBitsMask());
+		ret.setSequence((id >>> idMeta.getSequenceBitsStartPos()) & idMeta.getSequenceBitsMask());
 
 		return ret;
 	}

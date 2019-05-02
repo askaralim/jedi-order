@@ -4,56 +4,38 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.taklip.jediorder.bean.IdMeta;
 
+@Component
 public class SimpleTimer implements Timer {
 	protected static final Logger log = LoggerFactory.getLogger(SimpleTimer.class);
+
+	protected static final long EPOCH = 1514736000000L;
+
 	protected IdMeta idMeta;
 	protected long maxTime;
-	protected long epoch = EPOCH;
 
-	public void init(IdMeta idMeta) {
-		this.idMeta = idMeta;
-		this.maxTime = (1L << idMeta.getTimeBits()) - 1;
-		this.genTime();
-		this.timerUsedLog();
+	public Date translateTime(long time) {
+		return new Date(time + EPOCH);
 	}
 
-	public void timerUsedLog() {
-		Date expirationDate = transTime(maxTime);
-		long days = ((expirationDate.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24));
-		log.info("The current time bit length is {}, the expiration date is {}, this can be used for {} days.",
-				idMeta.getTimeBits(), expirationDate, days);
-	}
+	public long generateTime() {
+		long time = (System.currentTimeMillis() - EPOCH);
 
-	public void setEpoch(long epoch) {
-		this.epoch = epoch;
-	}
+		validateTimestamp(time);
 
-	public Date transTime(long time) {
-		return new Date(time + epoch);
-	}
-
-	public void validateTimestamp(long lastTimestamp, long timestamp) {
-		if (timestamp < lastTimestamp) {
-			if (log.isErrorEnabled())
-				log.error(String.format("Clock moved backwards.  Refusing to generate id for %d second/milisecond.",
-						lastTimestamp - timestamp));
-
-			throw new IllegalStateException(
-					String.format("Clock moved backwards.  Refusing to generate id for %d second/milisecond.",
-							lastTimestamp - timestamp));
-		}
+		return time;
 	}
 
 	public long tillNextTimeUnit(final long lastTimestamp) {
 		if (log.isInfoEnabled())
 			log.info(String.format("Ids are used out during %d. Waiting till next second/milisencond.", lastTimestamp));
 
-		long timestamp = genTime();
+		long timestamp = generateTime();
 		while (timestamp <= lastTimestamp) {
-			timestamp = genTime();
+			timestamp = generateTime();
 		}
 
 		if (log.isInfoEnabled())
@@ -62,19 +44,26 @@ public class SimpleTimer implements Timer {
 		return timestamp;
 	}
 
-	public long genTime() {
-		long time = (System.currentTimeMillis() - epoch);
-
-		validateTimestamp(time);
-
-		return time;
+	public void init(IdMeta idMeta) {
+		this.idMeta = idMeta;
+		this.maxTime = (1L << idMeta.getTimeBits()) - 1;
+		this.generateTime();
+		this.timerUsedLog();
 	}
 
-	protected void validateTimestamp(long timestamp) {
+	public void timerUsedLog() {
+		Date expirationDate = translateTime(maxTime);
+
+		long days = ((expirationDate.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24));
+
+		log.info("The current time bit length is {}, the expiration date is {}, this can be used for {} days.",
+			idMeta.getTimeBits(), expirationDate, days);
+	}
+
+	private void validateTimestamp(long timestamp) {
 		if (timestamp > maxTime) {
 			String error = String.format(
-				"The current timestamp (%s >= %s) has overflowed, Vesta Service will be terminate.", timestamp,
-				maxTime);
+				"The current timestamp (%s >= %s) has overflowed, Id Generator will be terminate.", timestamp, maxTime);
 
 			log.error(error);
 
@@ -82,4 +71,15 @@ public class SimpleTimer implements Timer {
 		}
 	}
 
+	public void validateTimestamp(long lastTimestamp, long timestamp) {
+		if (timestamp < lastTimestamp) {
+			if (log.isErrorEnabled())
+				log.error(String.format("Clock moved backwards.  Refusing to generate id for %d second/milisecond.",
+					lastTimestamp - timestamp));
+
+			throw new IllegalStateException(
+				String.format("Clock moved backwards.  Refusing to generate id for %d second/milisecond.",
+					lastTimestamp - timestamp));
+		}
+	}
 }

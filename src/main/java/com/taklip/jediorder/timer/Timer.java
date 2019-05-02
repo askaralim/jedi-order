@@ -5,16 +5,13 @@ import java.util.Date;
 import com.taklip.jediorder.bean.IdMeta;
 
 public interface Timer {
-	long EPOCH = 1514736000000L;
+	Date translateTime(long time);
 
-	void init(IdMeta idMeta);
-
-	Date transTime(long time);
-
-	void validateTimestamp(long lastTimestamp, long timestamp);
+	long generateTime();
 
 	long tillNextTimeUnit(long lastTimestamp);
 
-	long genTime();
+	void init(IdMeta idMeta);
 
+	void validateTimestamp(long lastTimestamp, long timestamp);
 }
