@@ -7,8 +7,6 @@ public class IdMeta {
 	private byte versionBits;
 
 	public IdMeta(byte versionBits, byte timeBits, byte machineBits, byte sequenceBits) {
-		super();
-
 		this.versionBits = versionBits;
 		this.timeBits = timeBits;
 		this.machineBits = machineBits;
@@ -74,36 +72,4 @@ public class IdMeta {
 	public long getSequenceBitsMask() {
 		return -1L ^ -1L << sequenceBits;
 	}
-
-//	public byte getGenMethodBits() {
-//		return genMethodBits;
-//	}
-//
-//	public void setGenMethodBits(byte genMethodBits) {
-//		this.genMethodBits = genMethodBits;
-//	}
-//
-//	public long getGenMethodBitsStartPos() {
-//		return machineBits + seqBits + timeBits;
-//	}
-//
-//	public long getGenMethodBitsMask() {
-//		return -1L ^ -1L << genMethodBits;
-//	}
-//
-//	public byte getTypeBits() {
-//		return typeBits;
-//	}
-//
-//	public void setTypeBits(byte typeBits) {
-//		this.typeBits = typeBits;
-//	}
-//
-//	public long getTypeBitsStartPos() {
-//		return machineBits + seqBits + timeBits + genMethodBits;
-//	}
-//
-//	public long getTypeBitsMask() {
-//		return -1L ^ -1L << typeBits;
-//	}
 }

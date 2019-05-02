@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,7 @@ import com.taklip.jediorder.service.IdService;
 import com.taklip.jediorder.timer.Timer;
 
 @Service
-public class IdServiceImpl implements IdService, InitializingBean {
+public class IdServiceImpl implements IdService {
 	protected final Logger log = LoggerFactory.getLogger(IdServiceImpl.class);
 
 	protected long machineId = -1;
