@@ -74,7 +74,7 @@ public class SimpleTimer implements Timer {
 	public void validateTimestamp(long lastTimestamp, long timestamp) {
 		if (timestamp < lastTimestamp) {
 			if (log.isErrorEnabled())
-				log.error(String.format("Clock moved backwards.  Refusing to generate id for %d second/milisecond.",
+				log.error(String.format("Clock moved backwards. Refusing to generate id for %d second/milisecond.",
 					lastTimestamp - timestamp));
 
 			throw new IllegalStateException(

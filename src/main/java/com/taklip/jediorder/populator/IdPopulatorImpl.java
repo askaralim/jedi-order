@@ -16,15 +16,12 @@ public class IdPopulatorImpl implements IdPopulator, ResetPopulator {
 
 	private Lock lock = new ReentrantLock();
 
-	public IdPopulatorImpl() {
-		super();
-	}
-
 	public void populateId(Timer timer, Id id, IdMeta idMeta) {
 		lock.lock();
 
 		try {
 			long timestamp = timer.generateTime();
+
 			timer.validateTimestamp(lastTimestamp, timestamp);
 
 			if (timestamp == lastTimestamp) {

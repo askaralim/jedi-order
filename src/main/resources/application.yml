@@ -1,2 +1,7 @@
+logging:
+   level:
+      org:
+         springframework: DEBUG
+
 jediorder: 
    machine-id: 1023
