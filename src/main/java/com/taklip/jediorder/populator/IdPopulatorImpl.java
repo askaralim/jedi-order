@@ -3,20 +3,24 @@ package com.taklip.jediorder.populator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.taklip.jediorder.bean.Id;
 import com.taklip.jediorder.bean.IdMeta;
-import com.taklip.jediorder.timer.Timer;
+import com.taklip.jediorder.timer.TimeService;
 
-@Component
+@Service
 public class IdPopulatorImpl implements IdPopulator, ResetPopulator {
+	@Autowired
+	protected IdMeta idMeta;
+
 	protected long sequence = 0;
 	protected long lastTimestamp = -1;
 
 	private Lock lock = new ReentrantLock();
 
-	public void populateId(Timer timer, Id id, IdMeta idMeta) {
+	public void populateId(TimeService timer, Id id) {
 		lock.lock();
 
 		try {

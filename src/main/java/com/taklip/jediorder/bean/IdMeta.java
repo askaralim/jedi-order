@@ -1,12 +1,15 @@
 package com.taklip.jediorder.bean;
 
 public class IdMeta {
-	private byte machineBits;
-	private byte sequenceBits;
-	private byte timeBits;
-	private byte versionBits;
+	//|Version|Time|Machine Id|Sequence|
+	//|*0*|*1-41*|*42-51*|*52-63*|
+	private final byte versionBits;
+	private final byte timeBits;
+	private final byte machineBits;
+	private final byte sequenceBits;
 
 	public IdMeta(byte versionBits, byte timeBits, byte machineBits, byte sequenceBits) {
+		super();
 		this.versionBits = versionBits;
 		this.timeBits = timeBits;
 		this.machineBits = machineBits;
@@ -17,20 +20,12 @@ public class IdMeta {
 		return versionBits;
 	}
 
-	public void setVersionBits(byte versionBits) {
-		this.versionBits = versionBits;
-	}
-
 	public long getVersionBitsMask() {
 		return -1L ^ -1L << versionBits;
 	}
 
 	public byte getTimeBits() {
 		return timeBits;
-	}
-
-	public void setTimeBits(byte timeBits) {
-		this.timeBits = timeBits;
 	}
 
 	public long getTimeBitsStartPos() {
@@ -45,10 +40,6 @@ public class IdMeta {
 		return machineBits;
 	}
 
-	public void setMachineBits(byte machineBits) {
-		this.machineBits = machineBits;
-	}
-
 	public long getMachineBitsStartPos() {
 		return versionBits + timeBits;
 	}
@@ -59,10 +50,6 @@ public class IdMeta {
 
 	public byte getSequenceBits() {
 		return sequenceBits;
-	}
-
-	public void setSequenceBits(byte sequenceBits) {
-		this.sequenceBits = sequenceBits;
 	}
 
 	public long getSequenceBitsStartPos() {
