@@ -1,6 +1,7 @@
 package com.taklip.jediorder;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +20,78 @@ public class JediOrderApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		long id = idService.generateId();
+		final int number = 100;
 
-		System.out.println(id);
+		Thread[] treads = new Thread[number];
 
-		Id idObj = idService.explainId(id);
+		boolean flag = false;
 
-		System.out.println(idObj);
+		CyclicBarrier barrier = new CyclicBarrier(number, new BarrierRun(flag, number));
 
-		assertThat(idObj.getMachine()).isEqualTo(1023L);
+		System.out.println("Start generate id.");
+
+		for (int i = 0; i < number; ++i) {
+			System.out.println("Generator ID[" + i + "] started.");
+
+			treads[i] = new Thread(new IDGenerator(i, barrier));
+
+			treads[i].start();
+		}
+	}
+
+	public class IDGenerator implements Runnable {
+		private Integer genId;
+		private final CyclicBarrier barrier;
+
+		IDGenerator(Integer genId, CyclicBarrier barrier) {
+			this.genId = genId;
+			this.barrier = barrier;
+		}
+
+		@Override
+		public void run() {
+			try {
+				barrier.await();
+
+				doGenerator();
+
+				barrier.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+		}
+
+		void doGenerator() {
+			long id = idService.generateId();
+
+			System.out.println("Generator ID[" + genId + "] create UNIQUE ID:" + id);
+
+			Id idObj = idService.explainId(id);
+
+			System.out.println("Generator ID[" + genId + "] explain UNIQUE ID[" + id + "], result:" + idObj);
+		}
+	}
+
+	public class BarrierRun implements Runnable {
+		boolean flag;
+		int number;
+
+		BarrierRun(boolean flag, int number) {
+			this.flag = flag;
+			this.number = number;
+		}
+
+		@Override
+		public void run() {
+			if (flag) {
+				System.out.println("All Generator [" + number + "] completed.");
+			}
+			else {
+				System.out.println("All Generator [" + number + "] initialized.");
+				flag = true;
+			}
+		}
 	}
 }
